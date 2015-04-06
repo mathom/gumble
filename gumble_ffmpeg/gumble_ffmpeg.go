@@ -19,8 +19,10 @@ const (
 type Stream struct {
 	Command string
 	Volume  float32
+	ElapsedTime float64
 
 	playLock sync.Mutex
+	playStart time.Time
 
 	client *gumble.Client
 	cmd    *exec.Cmd
@@ -54,7 +56,7 @@ func (s *Stream) PlayExec(name string, args []string, callbacks ...func()) error
 		cmd.Wait()
 	}
 	callbacks = append(callbacks, cb)
-	err = s.play("-", pipe, callbacks...)
+	err = s.play("-", pipe, 0.0, callbacks...)
 	if err != nil {
 		cb()
 		return err
@@ -63,21 +65,23 @@ func (s *Stream) PlayExec(name string, args []string, callbacks ...func()) error
 }
 
 func (s *Stream) PlayReader(in io.Reader, callbacks ...func()) error {
-	return s.play("-", in, callbacks...)
+	return s.play("-", in, 0.0, callbacks...)
 }
 
-func (s *Stream) Play(file string, callbacks ...func()) error {
-	return s.play(file, nil, callbacks...)
+func (s *Stream) Play(file string, startSeconds float64, callbacks ...func()) error {
+	return s.play(file, nil, startSeconds, callbacks...)
 }
 
-func (s *Stream) play(file string, in io.Reader, callbacks ...func()) error {
+func (s *Stream) play(file string, in io.Reader, startSeconds float64, callbacks ...func()) error {
 	s.playLock.Lock()
 	defer s.playLock.Unlock()
 
 	if s.IsPlaying() {
 		return errors.New("already playing")
 	}
-	cmd := exec.Command(s.Command, "-i", file, "-ac", "1", "-ar", strconv.Itoa(gumble.AudioSampleRate), "-f", "s16le", "-")
+	s.playStart = time.Now().Add(time.Duration(-startSeconds)*time.Second)
+	s.ElapsedTime = 0.0
+	cmd := exec.Command(s.Command, "-i", file, "-ss", strconv.FormatFloat(startSeconds, 'f', -1, 32), "-ac", "1", "-ar", strconv.Itoa(gumble.AudioSampleRate), "-f", "s16le", "-")
 	if pipe, err := cmd.StdoutPipe(); err != nil {
 		return err
 	} else {
@@ -136,6 +140,7 @@ func (s *Stream) sourceRoutine(callbacks []func()) {
 	for {
 		select {
 		case <-s.stop:
+			s.ElapsedTime = time.Since(s.playStart).Seconds()
 			return
 		case <-ticker.C:
 			if _, err := io.ReadFull(s.pipe, byteBuffer); err != nil {
@@ -145,6 +150,7 @@ func (s *Stream) sourceRoutine(callbacks []func()) {
 				float := float32(int16(binary.LittleEndian.Uint16(byteBuffer[i*2 : (i+1)*2])))
 				int16Buffer[i] = int16(s.Volume * float)
 			}
+			s.ElapsedTime = time.Since(s.playStart).Seconds()
 			s.client.Send(gumble.AudioBuffer(int16Buffer))
 		}
 	}
