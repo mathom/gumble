@@ -81,7 +81,14 @@ func (s *Stream) play(file string, in io.Reader, startSeconds float64, callbacks
 	}
 	s.playStart = time.Now().Add(time.Duration(-startSeconds)*time.Second)
 	s.ElapsedTime = 0.0
-	cmd := exec.Command(s.Command, "-i", file, "-ss", strconv.FormatFloat(startSeconds, 'f', -1, 32), "-ac", "1", "-ar", strconv.Itoa(gumble.AudioSampleRate), "-f", "s16le", "-")
+    
+	cmd_args := []string{"-i", file, "-ac", "1", "-ar", strconv.Itoa(gumble.AudioSampleRate), "-f", "s16le", "-"}
+	if (startSeconds > 0) {
+		cmd_args = append([]string{"-ss", strconv.FormatFloat(startSeconds, 'f', -1, 32)}, cmd_args...)
+	}
+
+	cmd := exec.Command(s.Command, cmd_args...)
+
 	if pipe, err := cmd.StdoutPipe(); err != nil {
 		return err
 	} else {
