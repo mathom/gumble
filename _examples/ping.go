@@ -6,7 +6,7 @@ import (
 	"os"
 	"time"
 
-	"github.com/layeh/gumble/gumble"
+	"github.com/mathom/gumble/gumble"
 )
 
 func main() {

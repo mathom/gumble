@@ -6,7 +6,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/layeh/gumble/gumble"
+	"github.com/mathom/gumble/gumble"
 )
 
 // Main aids in the creation of a basic command line gumble bot. It accepts the

@@ -11,8 +11,8 @@ import (
 
 	"github.com/golang/protobuf/proto"
 	"github.com/layeh/gopus"
-	"github.com/layeh/gumble/gumble/MumbleProto"
-	"github.com/layeh/gumble/gumble/varint"
+	"github.com/mathom/gumble/gumble/MumbleProto"
+	"github.com/mathom/gumble/gumble/varint"
 )
 
 type handlerFunc func(*Client, []byte) error

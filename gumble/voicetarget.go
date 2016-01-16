@@ -1,7 +1,7 @@
 package gumble
 
 import (
-	"github.com/layeh/gumble/gumble/MumbleProto"
+	"github.com/mathom/gumble/gumble/MumbleProto"
 )
 
 // TargetLoopback is a special voice target which causes any audio sent to the

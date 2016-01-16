@@ -1,5 +1,7 @@
 # gumble
 
+Notice: this is a fork of gumble to support [my fork of 0.7.0 piepan](https://github.com/mathom/piepan).
+
 ## Sub-projects
 
 - gumble
@@ -15,7 +17,7 @@
 
 - [barnard](https://github.com/layeh/barnard)
     - terminal-based Mumble client
-- [piepan](https://github.com/layeh/piepan)
+- [piepan](https://github.com/mathom/piepan)
     - an easy to use framework for writing scriptable Mumble bots using JavaScript
 
 ## License

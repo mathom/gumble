@@ -8,7 +8,7 @@ import (
 	"io/ioutil"
 	"os"
 
-	"github.com/layeh/gumble/gumble"
+	"github.com/mathom/gumble/gumble"
 )
 
 // CertificateLockFile adds a new certificate lock on the given Client that
